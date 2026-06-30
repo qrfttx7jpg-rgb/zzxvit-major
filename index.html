@@ -149,30 +149,7 @@
       <a href="http://www.zzxvit.edu.cn" target="_blank" rel="noopener">学校官网</a>
     </p>
   </div>
-  <p style="margin-top:8px;color:var(--gray-500);font-size:13px;">👩‍🎓 学姐邀请进新生群 · 微信号：<strong>19139914243</strong></p>
 </footer>
-
-<!-- 学姐邀请浮窗 -->
-<div class="wechat-float" onclick="showWechat()">
-  <span class="wechat-icon">👩‍🎓</span>
-  <span>学姐邀请进新生群</span>
-</div>
-
-<!-- 学姐邀请弹窗 -->
-<div class="modal-overlay" id="wechatModal" onclick="closeWechat(event)">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeWechat()">✕</button>
-    <div class="modal-icon">👩‍🎓</div>
-    <h3 style="margin:8px 0 4px;">学姐邀请你加入新生群</h3>
-    <p style="color:var(--gray-500);font-size:14px;margin:8px 0 16px;">扫码添加学姐微信，拉你进新生交流群</p>
-    <div class="qq-number-box" style="flex-direction:column;gap:8px;">
-      <span style="font-size:13px;color:var(--gray-500);">学姐微信号</span>
-      <span id="wechatId" style="font-size:22px;font-weight:700;color:var(--primary);">19139914243</span>
-      <button class="btn btn-primary" style="width:100%;padding:10px;font-size:14px;" onclick="copyWechat()">复制微信号</button>
-    </div>
-    <p style="font-size:13px;color:var(--gray-400);margin-top:12px;">复制微信号 → 打开微信 → 添加好友 → 发送"新生"即可入群</p>
-  </div>
-</div>
 
 <script src="data.js"></script>
 <script>
@@ -473,32 +450,3 @@ document.addEventListener('DOMContentLoaded', function() {
     if (e.key === 'Enter') document.getElementById('queryForm').dispatchEvent(new Event('submit'));
   });
 
-  // 学姐邀请功能
-  window.showWechat = function() {
-    document.getElementById("wechatModal").classList.add("open");
-  };
-  window.closeWechat = function(e) {
-    if (!e || e.target.classList.contains("modal-overlay")) {
-      document.getElementById("wechatModal").classList.remove("open");
-    }
-  };
-  window.copyWechat = function() {
-    const text = document.getElementById("wechatId").textContent;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function() {
-        alert("学姐微信号已复制：" + text + "\n打开微信添加即可！");
-      });
-    } else {
-      const ta = document.createElement("textarea");
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand("copy");
-      document.body.removeChild(ta);
-      alert("学姐微信号已复制：" + text + "\n打开微信添加即可！");
-    }
-  };
-});
-</script>
-</body>
-</html>
