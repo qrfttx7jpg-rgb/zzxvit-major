@@ -91,7 +91,7 @@
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span class="prob-level" id="schoolProbLevel">保底</span>
-        <span class="prob-note">基于近3年河南最低投档线估算</span>
+        <span class="prob-note">基于近5年河南最低投档线估算</span>
       </div>
 
       <!-- Zone indicator -->
@@ -143,7 +143,7 @@
 
       <div class="disclaimer">
         <strong>⚠️ 数据说明：</strong>
-        本系统录取概率基于该校近3年在河南的公开招录数据估算，仅供志愿填报参考。实际录取结果受当年报考人数、试题难度、招生计划变动等多因素影响，请结合官方招生简章综合判断。
+        本系统录取概率基于该校近5年在河南的公开招录数据估算，仅供志愿填报参考。实际录取结果受当年报考人数、试题难度、招生计划变动等多因素影响，请结合官方招生简章综合判断。
       </div>
     </div>
   </div>
@@ -246,8 +246,8 @@ function initSortTabs() {
 // 计算概率和等级
 function calcSchoolProbability(score, subject) {
   const lines = SCHOOL_DATA.admissionLines[subject];
-  const latest = lines[2024] || lines[2023];
-  return calcAdmitProbability(score, {predictScore: latest.avg}, SCHOOL_DATA, subject);
+  const avg = getWeightedAvgYear(lines, 'avg');
+  return calcAdmitProbability(score, {predictScore: avg}, SCHOOL_DATA, subject);
 }
 
 // 查询主逻辑
@@ -308,18 +308,19 @@ function updateSchoolProb(prob) {
   levelEl.textContent = prob.schoolLevel;
   levelEl.className = 'prob-level ' + prob.schoolLevel.replace('风险较大', 'risky').replace('冲刺', 'risky').replace('稳妥', 'steady').replace('保底', 'safe');
 
-  // Zone indicators
+  // Zone indicators — 基于5年加权平均分
   const lines = SCHOOL_DATA.admissionLines[currentSubject];
-  const latest = lines[2024] || lines[2023];
-  document.getElementById('zoneRisky').textContent = '≤ ' + (latest.avg - 25) + '分';
-  document.getElementById('zoneSteady').textContent = (latest.avg - 24) + '-' + (latest.avg + 9) + '分';
-  document.getElementById('zoneSafe').textContent = '≥ ' + (latest.avg + 10) + '分';
+  const wAvg = getWeightedAvgYear(lines, 'avg');
+  document.getElementById('zoneRisky').textContent = '≤ ' + (wAvg - 25) + '分';
+  document.getElementById('zoneSteady').textContent = (wAvg - 24) + '-' + (wAvg + 9) + '分';
+  document.getElementById('zoneSafe').textContent = '≥ ' + (wAvg + 10) + '分';
 
-  // 更新学校位次信息
-  const minRank = scoreToRank(latest.min, currentSubject);
-  const avgRank = scoreToRank(latest.avg, currentSubject);
+  // 更新学校位次信息（2024年最新数据 + 5年平均）
+  const latestYear = lines[2024] || lines[2023];
+  const minRank = scoreToRank(latestYear.min, currentSubject);
+  const wAvgRank = scoreToRank(wAvg, currentSubject);
   document.getElementById('schoolMinRank').textContent = formatRank(minRank);
-  document.getElementById('schoolAvgRank').textContent = formatRank(avgRank);
+  document.getElementById('schoolAvgRank').textContent = formatRank(wAvgRank);
 }
 
 // 渲染专业列表
