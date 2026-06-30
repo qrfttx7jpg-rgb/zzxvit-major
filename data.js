@@ -464,6 +464,59 @@ function calcAdmitProbability(score, major, schoolData, subject) {
   return { schoolProb, schoolLevel, majorProb, majorLevel: level };
 }
 
+
+// ========== 位次（省排名）估算 ==========
+// 基于河南省近3年专科批次一分一段表趋势估算
+const RANK_TABLE = {
+  science: {
+    // 分数 → 排名 (理科)
+    points: [200, 220, 240, 260, 280, 300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 420, 440],
+    ranks:  [485000, 478000, 468000, 455000, 435000, 410000, 395000, 380000, 362000, 342000, 320000, 296000, 270000, 245000, 220000, 195000, 150000, 115000]
+  },
+  arts: {
+    points: [200, 220, 240, 260, 280, 290, 300, 310, 320, 330, 340, 350, 360, 370, 380, 400, 420],
+    ranks:  [325000, 318000, 308000, 295000, 278000, 268000, 256000, 243000, 228000, 212000, 195000, 176000, 158000, 140000, 122000, 95000, 72000]
+  }
+};
+
+// 分数换算为省排名
+function scoreToRank(score, subject) {
+  const table = RANK_TABLE[subject];
+  if (!table || !table.points || table.points.length === 0) return 0;
+  
+  if (score <= table.points[0]) return table.ranks[0];
+  if (score >= table.points[table.points.length - 1]) return table.ranks[table.points.length - 1];
+  
+  for (let i = 0; i < table.points.length - 1; i++) {
+    if (score >= table.points[i] && score <= table.points[i + 1]) {
+      const ratio = (score - table.points[i]) / (table.points[i + 1] - table.points[i]);
+      const rank = table.ranks[i] - (table.ranks[i] - table.ranks[i + 1]) * ratio;
+      return Math.round(rank);
+    }
+  }
+  // 分数在表格范围外，但低于最低分
+  if (score < table.points[0]) return table.ranks[0] + Math.round((table.points[0] - score) * 300);
+  return table.ranks[table.points.length - 1];
+}
+
+// 排名换算为分数（反向查找）
+function rankToScore(rank, subject) {
+  const table = RANK_TABLE[subject];
+  if (!table || !table.ranks || table.ranks.length === 0) return 0;
+  
+  if (rank >= table.ranks[0]) return table.points[0];
+  if (rank <= table.ranks[table.ranks.length - 1]) return table.points[table.points.length - 1];
+  
+  for (let i = 0; i < table.ranks.length - 1; i++) {
+    if (rank <= table.ranks[i] && rank >= table.ranks[i + 1]) {
+      const ratio = (table.ranks[i] - rank) / (table.ranks[i] - table.ranks[i + 1]);
+      const score = table.points[i] + (table.points[i + 1] - table.points[i]) * ratio;
+      return Math.round(score);
+    }
+  }
+  return table.points[0];
+}
+
 function calcPercentile(score, subject) {
   const lines = SCHOOL_DATA.admissionLines[subject];
   const latestAvg = lines[2024]?.avg || lines[2023]?.avg;
