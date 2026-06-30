@@ -73,6 +73,11 @@
       <div class="score-display" id="resultScore">350</div>
       <div class="score-label" id="resultSubject">河南理科</div>
       <div class="percentile-badge" id="resultPercentile">超过了约 65% 的考生</div>
+      <div style="margin-top:10px;display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+        <span style="font-size:14px;color:var(--gray-600);background:var(--gray-50);padding:4px 14px;border-radius:20px;">
+          位次：约 <strong id="resultRank" style="color:var(--primary);">—</strong> 名
+        </span>
+      </div>
     </div>
 
     <!-- School Admission Probability -->
@@ -106,6 +111,10 @@
           <div>稳妥区</div>
           <div id="zoneSafe">≥ 368分</div>
         </div>
+      </div>
+      <div style="margin-top:14px;padding:10px 14px;background:var(--gray-50);border-radius:8px;font-size:13px;color:var(--gray-600);text-align:center;line-height:1.8;">
+        📊 2024年最低位次约 <strong id="schoolMinRank" style="color:var(--primary);">—</strong> 名 ·
+        平均位次约 <strong id="schoolAvgRank" style="color:var(--primary);">—</strong> 名
       </div>
     </div>
 
@@ -270,6 +279,10 @@ function handleQuery(e) {
   const percentile = calcPercentile(score, subject);
   document.getElementById('resultPercentile').textContent = `超过了约 ${percentile}% 的考生`;
 
+  // 计算并展示位次
+  const rank = scoreToRank(score, subject);
+  document.getElementById('resultRank').textContent = formatRank(rank);
+
   // 学校级概率
   const prob = calcSchoolProbability(score, subject);
   updateSchoolProb(prob);
@@ -301,6 +314,12 @@ function updateSchoolProb(prob) {
   document.getElementById('zoneRisky').textContent = '≤ ' + (latest.avg - 25) + '分';
   document.getElementById('zoneSteady').textContent = (latest.avg - 24) + '-' + (latest.avg + 9) + '分';
   document.getElementById('zoneSafe').textContent = '≥ ' + (latest.avg + 10) + '分';
+
+  // 更新学校位次信息
+  const minRank = scoreToRank(latest.min, currentSubject);
+  const avgRank = scoreToRank(latest.avg, currentSubject);
+  document.getElementById('schoolMinRank').textContent = formatRank(minRank);
+  document.getElementById('schoolAvgRank').textContent = formatRank(avgRank);
 }
 
 // 渲染专业列表
@@ -405,8 +424,10 @@ function renderMajorList() {
           <div class="detail-section">
             <div class="detail-section-title">📊 录取参考</div>
             <p style="font-size:13px;color:var(--gray-600);">
-              近年该专业平均录取分：<strong>${m.avgScore}</strong> 分<br>
+              近年该专业平均录取分：<strong>${m.avgScore}</strong> 分
+              （位次约 <strong>${formatRank(scoreToRank(m.avgScore, currentSubject))}</strong> 名）<br>
               2025年预测录取分：<strong>${m.predictScore}</strong> 分
+              （位次约 <strong>${formatRank(scoreToRank(m.predictScore, currentSubject))}</strong> 名）
             </p>
             <div style="margin-top:8px;">
               <span class="prob-level ${prob.majorLevel.replace('风险较大','risky').replace('冲刺','risky').replace('稳妥','steady').replace('保底','safe')}">
@@ -430,6 +451,11 @@ function toggleMajorCard(el) {
 function getCategoryIcon(cat) {
   const icons = { it: '💻', ee: '⚙️', finance: '📊', construction: '🏗️', humanity: '📚' };
   return icons[cat] || '📖';
+}
+
+// 格式化数字（加千分位逗号）
+function formatRank(num) {
+  return String(num).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 }
 
 // 重置查询
