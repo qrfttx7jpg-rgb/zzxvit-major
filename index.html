@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="description" content="郑州信息科技职业学院 — 高考专业推荐与录取概率查询。输入分数，智能匹配推荐专业，查看学习内容、就业率与就业方向。">
+<title>郑州信息科技职业学院 · 专业推荐系统</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="container header-inner">
+    <div class="header-logo">🎓</div>
+    <div>
+      <h1>郑州信息科技职业学院
+        <span class="header-badge">公办 · 河南郑州</span>
+      </h1>
+      <div class="subtitle">同校专业推荐 · 录取概率查询</div>
+    </div>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <h2>输入分数，智能匹配最适合你的专业</h2>
+    <p>基于历年录取数据，为你推荐郑州信息科技职业学院的优质专业，了解学习内容、就业前景与录取概率</p>
+  </div>
+</section>
+
+<!-- Input Form -->
+<section class="form-section">
+  <div class="container">
+    <div class="card">
+      <form id="queryForm" autocomplete="off">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="score">高考总分</label>
+            <input type="number" id="score" placeholder="输入你的高考分数（0-750）" min="0" max="750" required>
+          </div>
+          <div class="form-group">
+            <label for="subject">科类</label>
+            <select id="subject" required>
+              <option value="science">理科</option>
+              <option value="arts">文科</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>兴趣方向（可多选）</label>
+            <div class="interest-grid" id="interestGrid">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 4px;">
+            <button type="submit" class="btn btn-primary">🔍 查询推荐专业</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Results -->
+<section class="results-section" id="resultsSection">
+  <div class="container">
+
+    <!-- Back button -->
+    <button class="back-btn no-print" onclick="resetQuery()">← 重新查询</button>
+
+    <!-- Score Overview -->
+    <div class="card score-overview">
+      <div class="score-display" id="resultScore">350</div>
+      <div class="score-label" id="resultSubject">河南理科</div>
+      <div class="percentile-badge" id="resultPercentile">超过了约 65% 的考生</div>
+    </div>
+
+    <!-- School Admission Probability -->
+    <div class="card prob-section" id="schoolProbSection">
+      <div class="prob-header">
+        <span class="prob-label">🏫 郑州信息科技职业学院 录取概率</span>
+        <span class="prob-value" id="schoolProbValue">85%</span>
+      </div>
+      <div class="prob-bar-track">
+        <div class="prob-bar-fill" id="schoolProbBar" style="width: 0%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <span class="prob-level" id="schoolProbLevel">保底</span>
+        <span class="prob-note">基于近3年河南最低投档线估算</span>
+      </div>
+
+      <!-- Zone indicator -->
+      <div class="zone-indicator">
+        <div class="zone-item risky">
+          <div class="zone-icon">🔴</div>
+          <div>风险较大</div>
+          <div id="zoneRisky">≤ 333分</div>
+        </div>
+        <div class="zone-item steady">
+          <div class="zone-icon">🟡</div>
+          <div>冲刺区</div>
+          <div id="zoneSteady">334-367分</div>
+        </div>
+        <div class="zone-item safe">
+          <div class="zone-icon">🟢</div>
+          <div>稳妥区</div>
+          <div id="zoneSafe">≥ 368分</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Major Recommendations -->
+    <div class="card" id="majorListSection">
+      <div class="card-title">
+        <span class="icon">📋</span>
+        <span>推荐专业列表</span>
+        <span style="font-size:13px;font-weight:400;color:var(--gray-400);margin-left:auto;" id="majorCount"></span>
+      </div>
+
+      <!-- Sort tabs -->
+      <div class="sort-tabs" id="sortTabs">
+        <button class="sort-tab active" data-sort="probability">按录取概率</button>
+        <button class="sort-tab" data-sort="employment">按就业率</button>
+        <button class="sort-tab" data-sort="name">按名称</button>
+      </div>
+
+      <!-- Interest filter -->
+      <div class="filter-section" id="filterSection">
+        <div class="interest-grid" id="filterGrid"></div>
+      </div>
+
+      <!-- Major list -->
+      <div class="major-list" id="majorList"></div>
+
+      <div class="disclaimer">
+        <strong>⚠️ 数据说明：</strong>
+        本系统录取概率基于该校近3年在河南的公开招录数据估算，仅供志愿填报参考。实际录取结果受当年报考人数、试题难度、招生计划变动等多因素影响，请结合官方招生简章综合判断。
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <p>郑州信息科技职业学院 · 专业推荐系统 | 数据仅供参考，以河南省教育考试院官方公布为准</p>
+    <p style="margin-top:4px;">
+      <a href="https://github.com" target="_blank" rel="noopener">GitHub</a> · 
+      <a href="http://www.zzxvit.edu.cn" target="_blank" rel="noopener">学校官网</a>
+    </p>
+  </div>
+</footer>
+
+<script src="data.js"></script>
+<script>
+// ============================================================
+// 主应用逻辑
+// ============================================================
+
+let currentSubject = 'science';
+let currentScore = 0;
+let selectedInterests = [];
+let currentSort = 'probability';
+let currentFilter = 'all';
+
+// 科类名称映射
+const SUBJECT_NAMES = { science: '河南理科', arts: '河南文科' };
+
+// 科类录取线参考
+const SUBJECT_LINES = {
+  science: { batch: 200, avg: 358 },
+  arts: { batch: 200, avg: 336 }
+};
+
+// 初始化兴趣标签
+function initInterestTags() {
+  const categories = getInterestCategories();
+  const grid = document.getElementById('interestGrid');
+  const filterGrid = document.getElementById('filterGrid');
+
+  // 输入区的兴趣选择
+  grid.innerHTML = categories.map(c => `
+    <div class="interest-tag" data-id="${c.id}" onclick="toggleInterest('${c.id}')">
+      <span class="emoji">${c.icon}</span>
+      <span>${c.name}</span>
+    </div>
+  `).join('');
+
+  // 结果区的兴趣筛选
+  filterGrid.innerHTML = `
+    <div class="interest-tag active" data-id="all" onclick="filterByInterest('all')">
+      <span>全部</span>
+    </div>
+  ` + categories.map(c => `
+    <div class="interest-tag" data-id="${c.id}" onclick="filterByInterest('${c.id}')">
+      <span class="emoji">${c.icon}</span>
+      <span>${c.name}</span>
+    </div>
+  `).join('');
+}
+
+// 切换兴趣选择
+function toggleInterest(id) {
+  const idx = selectedInterests.indexOf(id);
+  if (idx > -1) {
+    selectedInterests.splice(idx, 1);
+  } else {
+    selectedInterests.push(id);
+  }
+  document.querySelectorAll('#interestGrid .interest-tag').forEach(el => {
+    el.classList.toggle('active', selectedInterests.includes(el.dataset.id));
+  });
+}
+
+// 结果区兴趣筛选
+function filterByInterest(id) {
+  currentFilter = id;
+  document.querySelectorAll('#filterGrid .interest-tag').forEach(el => {
+    el.classList.toggle('active', el.dataset.id === id);
+  });
+  renderMajorList();
+}
+
+// 排序切换
+function initSortTabs() {
+  document.querySelectorAll('.sort-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.sort-tab').forEach(t => t.classList.remove('active'));
+      this.classList.add('active');
+      currentSort = this.dataset.sort;
+      renderMajorList();
+    });
+  });
+}
+
+// 计算概率和等级
+function calcSchoolProbability(score, subject) {
+  const lines = SCHOOL_DATA.admissionLines[subject];
+  const latest = lines[2024] || lines[2023];
+  return calcAdmitProbability(score, {predictScore: latest.avg}, SCHOOL_DATA, subject);
+}
+
+// 查询主逻辑
+function handleQuery(e) {
+  e.preventDefault();
+  const scoreInput = document.getElementById('score');
+  const subjectSelect = document.getElementById('subject');
+
+  const score = parseInt(scoreInput.value);
+  const subject = subjectSelect.value;
+
+  if (!score || score < 0 || score > 750) {
+    alert('请输入有效的高考分数（0-750分）');
+    return;
+  }
+
+  currentScore = score;
+  currentSubject = subject;
+
+  // 显示结果区
+  const resultsSection = document.getElementById('resultsSection');
+  resultsSection.classList.add('visible');
+  resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  // 更新分数概览
+  document.getElementById('resultScore').textContent = score;
+  document.getElementById('resultSubject').textContent = SUBJECT_NAMES[subject];
+
+  const percentile = calcPercentile(score, subject);
+  document.getElementById('resultPercentile').textContent = `超过了约 ${percentile}% 的考生`;
+
+  // 学校级概率
+  const prob = calcSchoolProbability(score, subject);
+  updateSchoolProb(prob);
+
+  // 渲染专业列表
+  currentFilter = 'all';
+  document.querySelectorAll('#filterGrid .interest-tag').forEach(el => {
+    el.classList.toggle('active', el.dataset.id === 'all');
+  });
+  renderMajorList();
+}
+
+// 更新学校概率显示
+function updateSchoolProb(prob) {
+  const valueEl = document.getElementById('schoolProbValue');
+  const barEl = document.getElementById('schoolProbBar');
+  const levelEl = document.getElementById('schoolProbLevel');
+
+  valueEl.textContent = prob.schoolProb + '%';
+  valueEl.className = 'prob-value ' + prob.schoolLevel.replace('风险较大', 'risky').replace('冲刺', 'risky').replace('稳妥', 'steady').replace('保底', 'safe');
+  barEl.style.width = prob.schoolProb + '%';
+  barEl.className = 'prob-bar-fill ' + prob.schoolLevel.replace('风险较大', 'risky').replace('冲刺', 'risky').replace('稳妥', 'steady').replace('保底', 'safe');
+  levelEl.textContent = prob.schoolLevel;
+  levelEl.className = 'prob-level ' + prob.schoolLevel.replace('风险较大', 'risky').replace('冲刺', 'risky').replace('稳妥', 'steady').replace('保底', 'safe');
+
+  // Zone indicators
+  const lines = SCHOOL_DATA.admissionLines[currentSubject];
+  const latest = lines[2024] || lines[2023];
+  document.getElementById('zoneRisky').textContent = '≤ ' + (latest.avg - 25) + '分';
+  document.getElementById('zoneSteady').textContent = (latest.avg - 24) + '-' + (latest.avg + 9) + '分';
+  document.getElementById('zoneSafe').textContent = '≥ ' + (latest.avg + 10) + '分';
+}
+
+// 渲染专业列表
+function renderMajorList() {
+  const majors = getMajorsBySubject(currentSubject);
+  const container = document.getElementById('majorList');
+
+  // 过滤
+  let filtered = [...majors];
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(m => m.category === currentFilter);
+  }
+  // 兴趣优先排序（选中的兴趣方向排前面）
+  if (selectedInterests.length > 0) {
+    filtered.sort((a, b) => {
+      const aMatch = selectedInterests.includes(a.category);
+      const bMatch = selectedInterests.includes(b.category);
+      if (aMatch && !bMatch) return -1;
+      if (!aMatch && bMatch) return 1;
+      return 0;
+    });
+  }
+
+  // 计算每个专业的概率
+  filtered = filtered.map(m => {
+    const prob = calcAdmitProbability(currentScore, m, SCHOOL_DATA, currentSubject);
+    return { ...m, _prob: prob };
+  });
+
+  // 排序
+  if (currentSort === 'probability') {
+    filtered.sort((a, b) => b._prob.majorProb - a._prob.majorProb);
+  } else if (currentSort === 'employment') {
+    filtered.sort((a, b) => {
+      const ar = parseFloat(a.employmentRate) || 0;
+      const br = parseFloat(b.employmentRate) || 0;
+      return br - ar;
+    });
+  } else if (currentSort === 'name') {
+    filtered.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'));
+  }
+
+  document.getElementById('majorCount').textContent = `共 ${filtered.length} 个专业`;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">📭</div>
+        <p>该方向暂无匹配专业</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = filtered.map((m, idx) => {
+    const prob = m._prob;
+    const probColor = prob.majorProb >= 60 ? 'var(--success)' : prob.majorProb >= 30 ? 'var(--warning)' : 'var(--danger)';
+    return `
+    <div class="major-card" data-idx="${idx}" onclick="toggleMajorCard(this)">
+      <div class="major-card-header">
+        <div class="major-icon ${m.category}">${getCategoryIcon(m.category)}</div>
+        <div class="major-info">
+          <div class="major-name">${m.name}
+            <span class="major-category">${m.categoryName}</span>
+          </div>
+          <div class="major-meta">
+            <span>学制 ${m.duration} 年</span>
+            <span>·</span>
+            <span>学费 ¥${m.tuition}/年</span>
+            ${selectedInterests.includes(m.category) ? '<span style="color:var(--primary)">· 兴趣匹配</span>' : ''}
+          </div>
+        </div>
+        <div class="major-prob">
+          <div class="major-prob-value" style="color:${probColor}">${prob.majorProb}%</div>
+          <div class="major-prob-label" style="color:${probColor}">${prob.majorLevel}</div>
+        </div>
+        <div class="major-expand-icon">▾</div>
+      </div>
+      <div class="major-card-body">
+        <div class="major-detail-grid">
+          <div class="detail-section">
+            <div class="detail-section-title">📖 专业介绍</div>
+            <p style="font-size:13px;color:var(--gray-600);line-height:1.7;">${m.description}</p>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-title">📚 主干课程</div>
+            <div class="course-tags">
+              ${m.courses.map(c => `<span class="course-tag">${c}</span>`).join('')}
+            </div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-title">💼 就业方向</div>
+            <div class="employment-stat">
+              <span class="rate">${m.employmentRate}</span>
+              <span class="rate-label">就业率</span>
+            </div>
+            <div class="salary-info">💰 起薪参考：${m.salaryRange}</div>
+            <ul class="employment-list" style="margin-top:8px;">
+              ${m.employmentDirections.map(d => `<li>${d}</li>`).join('')}
+            </ul>
+          </div>
+          <div class="detail-section">
+            <div class="detail-section-title">📊 录取参考</div>
+            <p style="font-size:13px;color:var(--gray-600);">
+              近年该专业平均录取分：<strong>${m.avgScore}</strong> 分<br>
+              2025年预测录取分：<strong>${m.predictScore}</strong> 分
+            </p>
+            <div style="margin-top:8px;">
+              <span class="prob-level ${prob.majorLevel.replace('风险较大','risky').replace('冲刺','risky').replace('稳妥','steady').replace('保底','safe')}">
+                您的录取概率：${prob.majorProb}%（${prob.majorLevel}）
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    `;
+  }).join('');
+}
+
+// 展开/折叠专业卡片
+function toggleMajorCard(el) {
+  el.classList.toggle('expanded');
+}
+
+// 获取分类图标
+function getCategoryIcon(cat) {
+  const icons = { it: '💻', ee: '⚙️', finance: '📊', construction: '🏗️', humanity: '📚' };
+  return icons[cat] || '📖';
+}
+
+// 重置查询
+function resetQuery() {
+  document.getElementById('resultsSection').classList.remove('visible');
+  document.getElementById('score').value = '';
+  document.getElementById('score').focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 初始化
+document.addEventListener('DOMContentLoaded', function() {
+  initInterestTags();
+  initSortTabs();
+  document.getElementById('queryForm').addEventListener('submit', handleQuery);
+
+  // 回车提交支持
+  document.getElementById('score').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('queryForm').dispatchEvent(new Event('submit'));
+  });
+});
+</script>
+</body>
+</html>
