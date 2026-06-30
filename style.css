@@ -797,8 +797,8 @@ body {
   .no-print { display: none; }
 }
 
-/* ========== QQ Group Float Button ========== */
-.qq-group-float {
+/* ========== 学姐邀请浮窗 ========== */
+.wechat-float {
   position: fixed;
   bottom: 24px;
   right: 24px;
@@ -819,16 +819,16 @@ body {
   font-family: inherit;
 }
 
-.qq-group-float:hover {
+.wechat-float:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(37,99,235,0.5);
 }
 
-.qq-group-float .qq-group-icon {
+.wechat-float .wechat-icon {
   font-size: 20px;
 }
 
-/* ========== Modal ========== */
+/* ========== 弹窗 ========== */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -918,7 +918,7 @@ body {
 
 /* ========== Mobile ========== */
 @media (max-width: 480px) {
-  .qq-group-float {
+  .wechat-float {
     bottom: 16px;
     right: 16px;
     padding: 10px 16px;
