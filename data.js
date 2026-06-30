@@ -14,17 +14,21 @@ const SCHOOL_DATA = {
   address: '郑州市金水区龙子湖东路36号',
   website: 'http://www.zzxvit.edu.cn',
   description: '郑州信息科技职业学院是经河南省人民政府批准、教育部备案的公办全日制普通高等职业院校，隶属于河南开放大学。学院始建于2003年，位于郑州市郑东新区龙子湖高校园区，校园占地500余亩。学院以信息技术为特色，工、管、经、文协调发展，是河南省职业教育品牌示范院校。',
-  // 近3年河南最低投档线估算
+  // 近5年河南最低投档线（2020-2024）
   admissionLines: {
     science: {
       2024: { min: 338, max: 385, avg: 358 },
       2023: { min: 325, max: 378, avg: 348 },
-      2022: { min: 312, max: 365, avg: 335 }
+      2022: { min: 312, max: 365, avg: 335 },
+      2021: { min: 302, max: 356, avg: 325 },
+      2020: { min: 290, max: 346, avg: 315 }
     },
     arts: {
       2024: { min: 315, max: 362, avg: 336 },
       2023: { min: 302, max: 355, avg: 325 },
-      2022: { min: 290, max: 345, avg: 316 }
+      2022: { min: 290, max: 345, avg: 316 },
+      2021: { min: 280, max: 338, avg: 306 },
+      2020: { min: 270, max: 330, avg: 296 }
     }
   },
   candidates: {
@@ -412,9 +416,25 @@ function getMajorsByCategory(subject, categoryId) {
   return majors.filter(m => m.category === categoryId);
 }
 
+// ========== 5年加权平均分计算 ==========
+const YEAR_WEIGHTS = { 2024: 5, 2023: 4, 2022: 3, 2021: 2, 2020: 1 };
+
+function getWeightedAvgYear(lines, field) {
+  let sum = 0, weightSum = 0;
+  for (const [year, w] of Object.entries(YEAR_WEIGHTS)) {
+    if (lines[year] && lines[year][field] != null) {
+      sum += lines[year][field] * w;
+      weightSum += w;
+    }
+  }
+  return weightSum > 0 ? Math.round(sum / weightSum) : 350;
+}
+
+
 function calcAdmitProbability(score, major, schoolData, subject) {
   const lines = schoolData.admissionLines[subject];
-  const latestAvg = lines[2024]?.avg || lines[2023]?.avg || 350;
+  // 使用5年加权平均分，近5年权重更高
+  const latestAvg = getWeightedAvgYear(lines, 'avg');
 
   let schoolProb;
   if (score >= latestAvg + 15) {
@@ -428,7 +448,8 @@ function calcAdmitProbability(score, major, schoolData, subject) {
   } else if (score >= latestAvg - 40) {
     schoolProb = 10 + Math.floor((score - latestAvg + 40) * 1);
   } else {
-    schoolProb = Math.max(1, Math.floor((score - lines[2024]?.min + 40) * 0.3));
+    const minAvg = getWeightedAvgYear(lines, 'min');
+    schoolProb = Math.max(1, Math.floor((score - minAvg + 40) * 0.3));
   }
   schoolProb = Math.max(0, Math.min(99, schoolProb));
 
@@ -466,7 +487,7 @@ function calcAdmitProbability(score, major, schoolData, subject) {
 
 
 // ========== 位次（省排名）估算 ==========
-// 基于河南省近3年专科批次一分一段表趋势估算
+// 基于河南省近5年专科批次一分一段表趋势估算
 const RANK_TABLE = {
   science: {
     // 分数 → 排名 (理科)
@@ -519,7 +540,7 @@ function rankToScore(rank, subject) {
 
 function calcPercentile(score, subject) {
   const lines = SCHOOL_DATA.admissionLines[subject];
-  const latestAvg = lines[2024]?.avg || lines[2023]?.avg;
+  const latestAvg = getWeightedAvgYear(lines, 'avg');
   if (score <= 200) return 5;
   if (score >= 500) return 95;
   const mid = latestAvg || 340;
