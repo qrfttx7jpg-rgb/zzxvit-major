@@ -144,33 +144,13 @@
 <footer class="footer">
   <div class="container">
     <p>郑州信息科技职业学院 · 专业推荐系统 | 数据仅供参考，以河南省教育考试院官方公布为准</p>
+    <p style="margin-top:8px;color:var(--gray-500);font-size:13px;">💬 咨询更多信息 · 添加学姐微信 <strong>19139914243</strong></p>
     <p style="margin-top:4px;">
       <a href="https://github.com" target="_blank" rel="noopener">GitHub</a> · 
       <a href="http://www.zzxvit.edu.cn" target="_blank" rel="noopener">学校官网</a>
     </p>
   </div>
 </footer>
-
-<!-- 咨询浮窗 -->
-<div class="contact-float" onclick="showContact()">
-  <span>💬 咨询</span>
-</div>
-
-<!-- 咨询弹窗 -->
-<div class="modal-overlay" id="contactModal" onclick="closeContact(event)">
-  <div class="modal-content">
-    <button class="modal-close" onclick="closeContact()">✕</button>
-    <div class="modal-icon">👩‍🎓</div>
-    <h3 style="margin:8px 0 4px;">咨询更多信息</h3>
-    <p style="color:var(--gray-500);font-size:14px;margin:8px 0 16px;">添加学姐微信，了解更多专业详情</p>
-    <div style="display:flex;flex-direction:column;align-items:center;gap:10px;background:var(--gray-50);padding:16px;border-radius:12px;border:1.5px dashed var(--primary-light);">
-      <span style="font-size:13px;color:var(--gray-500);">学姐微信号</span>
-      <span id="contactWechat" style="font-size:24px;font-weight:700;color:var(--primary);letter-spacing:1px;">19139914243</span>
-      <button class="btn btn-primary" style="width:100%;padding:10px;font-size:14px;" onclick="copyContact()">复制微信号</button>
-    </div>
-    <p style="font-size:13px;color:var(--gray-400);margin-top:12px;">复制微信号 → 打开微信 → 添加好友 → 发送"咨询"</p>
-  </div>
-</div>
 
 <script src="data.js"></script>
 <script>
@@ -470,25 +450,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('score').addEventListener('keydown', function(e) {
     if (e.key === 'Enter') document.getElementById('queryForm').dispatchEvent(new Event('submit'));
   });
-
-  });
-  // 咨询功能
-  window.showContact = function() {
-    document.getElementById('contactModal').classList.add('open'); };
-  window.closeContact = function(e) {
-    if (!e || e.target.classList.contains('modal-overlay'))
-      document.getElementById('contactModal').classList.remove('open'); };
-  window.copyContact = function() {
-    var text = document.getElementById('contactWechat').textContent;
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(function() {
-        alert('学姐微信号已复制：' + text); }); }
-    else {
-      var ta = document.createElement('textarea');
-      ta.value = text; document.body.appendChild(ta);
-      ta.select(); document.execCommand('copy');
-      document.body.removeChild(ta);
-      alert('学姐微信号已复制：' + text); } };
+});
 </script>
 </body>
 </html>
