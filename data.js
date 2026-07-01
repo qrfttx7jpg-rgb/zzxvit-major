@@ -478,23 +478,24 @@ function getLevel(prob) {
   return '风险较大';           // 风险较大
 }
 
-function calcAdmitProbability(score, major, schoolData, subject) {
+function calcAdmitProbability(score, major, schoolData, subject, userRank) {
   const lines = schoolData.admissionLines[subject];
   const wAvg = getWeightedAvgYear(lines, 'avg');
   const wMin = getWeightedAvgYear(lines, 'min');
 
   // 学校概率 —— 分数 × 30% + 位次 × 70%
   const schoolScoreProb = calcScoreBasedProb(score, wAvg, wMin);
-  const userRank = scoreToRank(score, subject);
+  // 如果用户填写了位次则直接使用，否则从分数换算
+  const actualRank = userRank || scoreToRank(score, subject);
   const schoolAvgRank = scoreToRank(wAvg, subject);
-  const schoolRankProb = calcRankBasedProb(userRank, schoolAvgRank);
+  const schoolRankProb = calcRankBasedProb(actualRank, schoolAvgRank);
   const schoolProb = Math.round(schoolScoreProb * 0.30 + schoolRankProb * 0.70);
 
   // 专业概率 —— 分数 × 30% + 位次 × 70%
   const majorAvg = major.predictScore || major.avgScore;
   const majorScoreProb = calcScoreBasedProb(score, majorAvg, majorAvg - 15);
   const majorAvgRank = scoreToRank(majorAvg, subject);
-  const majorRankProb = calcRankBasedProb(userRank, majorAvgRank);
+  const majorRankProb = calcRankBasedProb(actualRank, majorAvgRank);
   const majorProb = Math.round(majorScoreProb * 0.30 + majorRankProb * 0.70);
 
   return {
