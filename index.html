@@ -41,6 +41,10 @@
             <input type="number" id="score" placeholder="输入你的高考分数（0-750）" min="0" max="750" required>
           </div>
           <div class="form-group">
+            <label for="rank">全省位次 <span style="font-size:12px;color:var(--gray-400);font-weight:400;">（选填 · 更精准）</span></label>
+            <input type="number" id="rank" placeholder="如：120000" min="1" max="600000">
+          </div>
+          <div class="form-group">
             <label for="subject">科类</label>
             <select id="subject" required>
               <option value="science">理科</option>
@@ -244,10 +248,10 @@ function initSortTabs() {
 }
 
 // 计算概率和等级
-function calcSchoolProbability(score, subject) {
+function calcSchoolProbability(score, subject, rank) {
   const lines = SCHOOL_DATA.admissionLines[subject];
   const avg = getWeightedAvgYear(lines, 'avg');
-  return calcAdmitProbability(score, {predictScore: avg}, SCHOOL_DATA, subject);
+  return calcAdmitProbability(score, {predictScore: avg}, SCHOOL_DATA, subject, rank);
 }
 
 // 查询主逻辑
@@ -267,6 +271,14 @@ function handleQuery(e) {
   currentScore = score;
   currentSubject = subject;
 
+  // 读取位次（选填）
+  const rankInput = document.getElementById('rank');
+  const enteredRank = rankInput.value ? parseInt(rankInput.value) : null;
+  if (enteredRank && (enteredRank < 1 || enteredRank > 600000)) {
+    alert('请输入有效的全省位次（1-600000）');
+    return;
+  }
+
   // 显示结果区
   const resultsSection = document.getElementById('resultsSection');
   resultsSection.classList.add('visible');
@@ -279,12 +291,18 @@ function handleQuery(e) {
   const percentile = calcPercentile(score, subject);
   document.getElementById('resultPercentile').textContent = `超过了约 ${percentile}% 的考生`;
 
-  // 计算并展示位次
-  const rank = scoreToRank(score, subject);
+  // 计算并展示位次（优先使用用户输入的位次）
+  const rank = enteredRank || scoreToRank(score, subject);
   document.getElementById('resultRank').textContent = formatRank(rank);
+  currentRank = enteredRank;
+  // 如果用户输入了位次，在旁边标注"已填写"
+  const rankLabel = document.querySelector('#resultRank');
+  if (enteredRank) {
+    rankLabel.style.color = 'var(--success)';
+  }
 
   // 学校级概率
-  const prob = calcSchoolProbability(score, subject);
+  const prob = calcSchoolProbability(score, subject, enteredRank);
   updateSchoolProb(prob);
 
   // 渲染专业列表
@@ -346,7 +364,7 @@ function renderMajorList() {
 
   // 计算每个专业的概率
   filtered = filtered.map(m => {
-    const prob = calcAdmitProbability(currentScore, m, SCHOOL_DATA, currentSubject);
+    const prob = calcAdmitProbability(currentScore, m, SCHOOL_DATA, currentSubject, currentRank);
     return { ...m, _prob: prob };
   });
 
