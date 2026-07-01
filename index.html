@@ -83,7 +83,7 @@
     <!-- School Admission Probability -->
     <div class="card prob-section" id="schoolProbSection">
       <div class="prob-header">
-        <span class="prob-label">🏫 郑州信息科技职业学院 录取概率</span>
+        <span class="prob-label">🏫 郑州信息科技职业学院 录取概率（分数+位次综合）</span>
         <span class="prob-value" id="schoolProbValue">85%</span>
       </div>
       <div class="prob-bar-track">
@@ -91,7 +91,7 @@
       </div>
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span class="prob-level" id="schoolProbLevel">保底</span>
-        <span class="prob-note">基于近5年河南最低投档线估算</span>
+        <span class="prob-note">基于近6年分数+位次综合估算（位次权重70%）</span>
       </div>
 
       <!-- Zone indicator -->
@@ -143,7 +143,7 @@
 
       <div class="disclaimer">
         <strong>⚠️ 数据说明：</strong>
-        本系统录取概率基于该校近5年在河南的公开招录数据估算，仅供志愿填报参考。实际录取结果受当年报考人数、试题难度、招生计划变动等多因素影响，请结合官方招生简章综合判断。
+        本系统录取概率综合考虑高考分数与全省位次（位次权重70%），基于该校近6年在河南的公开招录数据分析，仅供志愿填报参考。实际录取受当年报考人数、试题难度、招生计划变动等多因素影响，请结合官方招生简章综合判断。
       </div>
     </div>
   </div>
@@ -308,7 +308,7 @@ function updateSchoolProb(prob) {
   levelEl.textContent = prob.schoolLevel;
   levelEl.className = 'prob-level ' + prob.schoolLevel.replace('风险较大', 'risky').replace('冲刺', 'risky').replace('稳妥', 'steady').replace('保底', 'safe');
 
-  // Zone indicators — 基于5年加权平均分
+  // Zone indicators — 基于6年加权平均分（分数×30% + 位次×70%）
   const lines = SCHOOL_DATA.admissionLines[currentSubject];
   const wAvg = getWeightedAvgYear(lines, 'avg');
   document.getElementById('zoneRisky').textContent = '≤ ' + (wAvg - 25) + '分';
